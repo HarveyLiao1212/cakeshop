@@ -1,5 +1,6 @@
 package com.harvey.cakeshop.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,6 +21,7 @@ public class User {
     @Column(name = "email")
     String   email;
 
+    @JsonIgnore
     @Column(name = "password")
     String  password;
 

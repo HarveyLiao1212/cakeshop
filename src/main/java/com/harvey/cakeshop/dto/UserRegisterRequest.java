@@ -1,10 +1,12 @@
 package com.harvey.cakeshop.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class UserRegisterRequest {
 
     @NotBlank
+    @Email
     String  email;
 
     @NotBlank
