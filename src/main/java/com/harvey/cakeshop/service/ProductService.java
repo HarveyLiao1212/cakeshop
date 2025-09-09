@@ -17,14 +17,7 @@ public class ProductService {
 
     public Product getProductById(Integer productId) {
 
-        Optional<Product> optional = productRepository.findById(productId);
-
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            return null;
-        }
-
+        return productRepository.findById(productId).orElse(null);
 
     }
 
