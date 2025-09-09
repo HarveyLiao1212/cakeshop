@@ -1,6 +1,7 @@
 package com.harvey.cakeshop.controller;
 
 
+import com.harvey.cakeshop.dto.UserLoginRequest;
 import com.harvey.cakeshop.dto.UserRegisterRequest;
 import com.harvey.cakeshop.model.User;
 import com.harvey.cakeshop.service.UserService;
@@ -28,7 +29,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
+    @PostMapping("/users/login")
+    public ResponseEntity<User> login(@RequestBody @Valid UserLoginRequest userLoginRequest){
 
+        User user = userService.login(userLoginRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+
+    }
 
 
 }

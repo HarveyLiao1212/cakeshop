@@ -1,6 +1,7 @@
 package com.harvey.cakeshop.service;
 
 
+import com.harvey.cakeshop.dto.UserLoginRequest;
 import com.harvey.cakeshop.dto.UserRegisterRequest;
 import com.harvey.cakeshop.model.User;
 import com.harvey.cakeshop.repository.UserRepository;
@@ -43,4 +44,22 @@ public class UserService {
     public User getUserById(Integer userId) {
         return userRepository.findById(userId).orElse(null);
     }
+
+    public User login(UserLoginRequest userLoginRequest) {
+        Optional<User> user = userRepository.findByEmail(userLoginRequest.getEmail());
+
+        if (user.isEmpty()) {
+            log.warn("該Email {} 尚未註冊",  userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if (user.get().getPassword().equals(userLoginRequest.getPassword())) {
+            return user.get();
+        }else {
+            log.warn("email {} 的密碼不正確",  userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
 }
