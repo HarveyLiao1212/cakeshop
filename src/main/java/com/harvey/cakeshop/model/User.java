@@ -16,22 +16,22 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    Integer userId;
+    private Integer userId;
 
     @Column(name = "email")
-    String   email;
+    private String   email;
 
     @JsonIgnore
     @Column(name = "password")
-    String  password;
+    private String  password;
 
     @CreatedDate
     @Column(name = "created_date")
-    java.util.Date createDate;
+    private java.util.Date createDate;
 
     @LastModifiedDate
     @Column(name = "last_modified_date")
-    java.util.Date lastModifiedDate;
+    private java.util.Date lastModifiedDate;
 
     public Integer getUserId() {
         return userId;

@@ -11,31 +11,31 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
-    Integer productId;
+    private Integer productId;
 
     @Column(name = "product_name")
-    String productName;
+    private String productName;
 
     @Column(name = "category")
-    String category;
+    private String category;
 
     @Column(name = "image_url")
-    String imageUrl;
+    private String imageUrl;
 
     @Column(name = "price")
-    Integer price;
+    private Integer price;
 
     @Column(name = "stock")
-    Integer stock;
+    private Integer stock;
 
     @Column(name = "description")
-    String description;
+    private String description;
 
     @Column(name = "created_date")
-    Date createdDate;
+    private Date createdDate;
 
     @Column(name = "last_modified_date")
-    Date lastModifiedDate;
+    private Date lastModifiedDate;
 
     public Integer getProductId() {
         return productId;

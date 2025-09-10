@@ -1,8 +1,7 @@
 package com.harvey.cakeshop.controller;
 
 
-import com.harvey.cakeshop.dto.UserLoginRequest;
-import com.harvey.cakeshop.dto.UserRegisterRequest;
+import com.harvey.cakeshop.dto.*;
 import com.harvey.cakeshop.model.User;
 import com.harvey.cakeshop.service.UserService;
 import jakarta.validation.Valid;
@@ -11,7 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -30,13 +33,40 @@ public class UserController {
     }
 
     @PostMapping("/users/login")
-    public ResponseEntity<User> login(@RequestBody @Valid UserLoginRequest userLoginRequest){
+    public ResponseEntity<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest userLoginRequest){
 
-        User user = userService.login(userLoginRequest);
+        UserLoginResponse userLoginResponse = userService.login(userLoginRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        return ResponseEntity.status(HttpStatus.OK).body(userLoginResponse);
 
     }
+
+    @PostMapping("/users/changepassword")
+    public ResponseEntity<Map<String,String>> changepassword(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody @Valid ChangePasswordRequest changePasswordRequest){
+
+        String accessToken = authHeader.replace("Bearer ", "");
+
+        userService.changePassword(accessToken, changePasswordRequest);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "密碼修改成功");
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
+
+    @PostMapping("/users/refresh")
+    public ResponseEntity<RefreshTokenResponse> refresh(@RequestBody RefreshTokenRequest request) {
+        String newAccessToken = userService.refreshAccessToken(request.getRefreshToken());
+
+        RefreshTokenResponse response = new RefreshTokenResponse();
+        response.setAccessToken(newAccessToken);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 
 }

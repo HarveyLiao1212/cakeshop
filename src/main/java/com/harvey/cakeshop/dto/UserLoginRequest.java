@@ -7,10 +7,10 @@ public class UserLoginRequest {
 
     @NotBlank
     @Email
-    String  email;
+    private String  email;
 
     @NotBlank
-    String  password;
+    private String  password;
 
     public String getEmail() {
         return email;
