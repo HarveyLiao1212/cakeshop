@@ -12,14 +12,17 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    // 固定 secret，不會因為重啟變掉
+    // 設定 secret key
     private final String secret = "ThisIsASimpleSecretKeyForJwt1234567890";
+
+    // 字串 → 位元陣列 → Key 物件
     private final Key key = Keys.hmacShaKeyFor(secret.getBytes());
 
-    private final long accessTokenExpiration = 1000 * 60 * 5;   // 5分鐘
-    private final long refreshTokenExpiration = 1000 * 60 * 60; // 1小時
+    // 設定 token 過期時間
+    private final long accessTokenExpiration = 1000 * 60 * 60 ;   // 1 小時
+    private final long refreshTokenExpiration = 1000 * 60 * 60 * 24 ; // 1 天
 
-    // 產生 Access Token
+    // 1. 產生 Access Token(header + payload + signature)
     public String generateAccessToken(String Email) {
         return Jwts.builder() // JWT 建構器
                 .setSubject(Email)
@@ -29,9 +32,9 @@ public class JwtService {
                 .compact(); // 把 JWT 壓縮成字串成為 token
     }
 
-    // 產生 Refresh Token
+    // 2. 產生 Refresh Token
     public String generateRefreshToken(String Email) {
-        return Jwts.builder() //
+        return Jwts.builder()
                 .setSubject(Email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
@@ -39,7 +42,7 @@ public class JwtService {
                 .compact();
     }
 
-    // 取得使用者email
+    // 3. 取得使用者email
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -49,16 +52,21 @@ public class JwtService {
                 .getSubject(); // 取得 email
     }
 
-    // 驗證 Token 是否有效
+    // 4. 驗證 Token 是否有效
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder() // 建立一個 JWT 解析器
                     .setSigningKey(key) // 設定密鑰來解析
                     .build() // 設定完成
                     .parseClaimsJws(token); // 開始解析token內容
-            return true; // 驗證成功
-        } catch (JwtException | IllegalArgumentException e) { // 接住JWT 解析相關錯誤 + 空值或非法參數錯誤
-            return false; // 驗證失敗（過期、簽名錯誤、格式錯誤等等）
+            // 驗證成功
+            return true;
+        } catch (JwtException e) {
+            // 所有 JWT 相關的錯誤
+            return false;
+        } catch (IllegalArgumentException e) {
+            // token 為 null、空字串或其他非法參數
+            return false;
         }
     }
 }

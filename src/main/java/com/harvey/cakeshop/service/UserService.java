@@ -28,19 +28,19 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
 
-    public Integer register(UserRegisterRequest userRegisterRequest) {
+    // 1.註冊功能
+    public User register(UserRegisterRequest userRegisterRequest) {
 
         // 檢查註冊過的Email
-        Optional<User> email = userRepository.findByEmail(userRegisterRequest.getEmail());
+        Optional<User> optionalUser = userRepository.findByEmail(userRegisterRequest.getEmail());
 
-        if (email.isPresent()) {
+        if (optionalUser.isPresent()) {
             log.warn("該Email {} 已經被註冊過",  userRegisterRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "帳號已存在");
         }
 
-        // 用sha256 生成密碼雜湊值
+        // 用 sha256 生成密碼雜湊值
         String hashedPassword = DigestUtils.sha256Hex(userRegisterRequest.getPassword());
-
 
         // 創建帳號
         User user = new User();
@@ -48,37 +48,36 @@ public class UserService {
         user.setPassword(hashedPassword);
         userRepository.save(user);
 
-        return user.getUserId();
+        // 回傳使用者資料
+        return user;
     }
 
-    public User getUserById(Integer userId) {
-        return userRepository.findById(userId).orElse(null);
-    }
-
+    // 2.登入功能
     public UserLoginResponse login(UserLoginRequest userLoginRequest) {
-        Optional<User> userEmail = userRepository.findByEmail(userLoginRequest.getEmail());
 
-        // 檢查user是否存在
-        if (userEmail.isEmpty()) {
+        // 檢查帳戶是否存在
+        Optional<User> optionalUser = userRepository.findByEmail(userLoginRequest.getEmail());
+
+        if (optionalUser.isEmpty()) {
             log.warn("該Email {} 尚未註冊",  userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "帳號不存在");
         }
 
-        // // 用sha256 生成密碼雜湊值
+        // 用sha256 生成密碼雜湊值
         String hashedPassword = DigestUtils.sha256Hex(userLoginRequest.getPassword());
 
         // 比較密碼
-        if (userEmail.get().getPassword().equals(hashedPassword)) {
+        if (optionalUser.get().getPassword().equals(hashedPassword)) {
 
             // 產生 Access Token 和 Refresh Token
             String accessToken = jwtService.generateAccessToken(userLoginRequest.getEmail());
             String refreshToken = jwtService.generateRefreshToken(userLoginRequest.getEmail());
 
-            // 組裝回傳物件
+            // 組裝回傳物件(email 和 Access Token 和 Refresh Token)
             UserLoginResponse userLoginResponse = new UserLoginResponse();
             userLoginResponse.setAccessToken(accessToken);
             userLoginResponse.setRefreshToken(refreshToken);
-            userLoginResponse.setEmail(userEmail.get().getEmail());
+            userLoginResponse.setEmail(optionalUser.get().getEmail());
 
             return  userLoginResponse;
         }else {
@@ -87,7 +86,42 @@ public class UserService {
         }
     }
 
+    // 3.修改密碼
+    public void changePassword(String accessToken, ChangePasswordRequest changePasswordRequest) {
+
+        // 到 jwtService 的 validateToken 驗證 access token 是否有效
+        if (jwtService.validateToken(accessToken) == false ) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "access Token 無效");
+        }
+
+        // 到 jwtService 的 extractUsername 取出使用者 email
+        String userEmail = jwtService.extractUsername(accessToken);
+
+        // 用 sha256 生成新密碼雜湊值
+        String newHashedPassword = DigestUtils.sha256Hex(changePasswordRequest.getNewPassword());
+        // 舊密碼雜湊值
+        String hashedPassword = DigestUtils.sha256Hex(changePasswordRequest.getOldPassword());
+
+        // 資料庫查詢email
+        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+
+        // 取出 optional 裡的物件
+        User user = optionalUser.get();
+
+        // 驗證舊密碼是否正確
+        if (user.getPassword().equals(hashedPassword)){
+            user.setPassword(newHashedPassword);
+            userRepository.save(user);
+            System.out.println("更改後的密碼雜湊值: " + user.getPassword());
+        }else {
+            log.warn("舊密碼不正確");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "舊的密碼錯誤");
+        }
+    }
+
+    // 4.更新token
     public String refreshAccessToken(String refreshToken) {
+
         // 驗證 refresh token 是否有效
         if (!jwtService.validateToken(refreshToken)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token 無效");
@@ -98,33 +132,6 @@ public class UserService {
 
         // 重新產生新的 access token
         return jwtService.generateAccessToken(userEmail);
-    }
-
-    public void changePassword(String accessToken, ChangePasswordRequest changePasswordRequest) {
-        // 驗證 access token 是否有效
-        if (!jwtService.validateToken(accessToken)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "access Token 無效");
-        }
-        // 取出使用者 email
-        String userEmail = jwtService.extractUsername(accessToken);
-
-        // 用sha256 生成新密碼雜湊值
-        String newHashedPassword = DigestUtils.sha256Hex(changePasswordRequest.getNewPassword());
-
-        String hashedPassword = DigestUtils.sha256Hex(changePasswordRequest.getOldPassword());
-
-        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
-        User user = optionalUser.get();
-        if (user.getPassword().equals(hashedPassword)){
-            user.setPassword(newHashedPassword);
-            System.out.println("更改後的密碼雜湊值: " + user.getPassword());
-            userRepository.save(user);
-        }else {
-            log.warn("舊密碼不正確");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "舊的密碼錯誤");
-        }
-
-
     }
 
 
