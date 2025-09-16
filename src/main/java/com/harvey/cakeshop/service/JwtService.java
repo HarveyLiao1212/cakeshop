@@ -18,12 +18,11 @@ public class JwtService {
     // 字串 → 位元陣列 → Key 物件
     private final Key key = Keys.hmacShaKeyFor(secret.getBytes());
 
-    // 設定 token 過期時間
-    private final long accessTokenExpiration = 1000 * 60 * 60 ;   // 1 小時
-    private final long refreshTokenExpiration = 1000 * 60 * 60 * 24 ; // 1 天
-
     // 1. 產生 Access Token(header + payload + signature)
     public String generateAccessToken(String Email) {
+
+        long accessTokenExpiration = 1000 * 60 * 60; // 1 小時
+
         return Jwts.builder() // JWT 建構器
                 .setSubject(Email)
                 .setIssuedAt(new Date()) // 設定 token 發行時間
@@ -34,6 +33,9 @@ public class JwtService {
 
     // 2. 產生 Refresh Token
     public String generateRefreshToken(String Email) {
+
+        long refreshTokenExpiration = 1000 * 60 * 60 * 24; // 1 天
+
         return Jwts.builder()
                 .setSubject(Email)
                 .setIssuedAt(new Date())
