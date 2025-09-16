@@ -87,15 +87,7 @@ public class UserService {
     }
 
     // 3.修改密碼
-    public void changePassword(String accessToken, ChangePasswordRequest changePasswordRequest) {
-
-        // 到 jwtService 的 validateToken 驗證 access token 是否有效
-        if (jwtService.validateToken(accessToken) == false ) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "access Token 無效");
-        }
-
-        // 到 jwtService 的 extractUsername 取出使用者 email
-        String userEmail = jwtService.extractUsername(accessToken);
+    public void changePassword(String userEmail, ChangePasswordRequest changePasswordRequest) {
 
         // 用 sha256 生成新密碼雜湊值
         String newHashedPassword = DigestUtils.sha256Hex(changePasswordRequest.getNewPassword());
@@ -120,15 +112,7 @@ public class UserService {
     }
 
     // 4.更新token
-    public String refreshAccessToken(String refreshToken) {
-
-        // 驗證 refresh token 是否有效
-        if (!jwtService.validateToken(refreshToken)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token 無效");
-        }
-
-        // 取出使用者 email
-        String userEmail = jwtService.extractUsername(refreshToken);
+    public String refreshAccessToken(String userEmail) {
 
         // 重新產生新的 access token
         return jwtService.generateAccessToken(userEmail);

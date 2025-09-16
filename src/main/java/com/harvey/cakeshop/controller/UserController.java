@@ -3,13 +3,13 @@ package com.harvey.cakeshop.controller;
 import com.harvey.cakeshop.dto.*;
 import com.harvey.cakeshop.model.User;
 import com.harvey.cakeshop.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // 註冊
+    // 1. 註冊API
     @PostMapping("/users/register")
     public ResponseEntity<UserRegisterResponse> register(
             @RequestBody @Valid UserRegisterRequest userRegisterRequest){
@@ -39,7 +39,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userRegisterResponse);
     }
 
-    // 登入
+    // 2. 登入API
     @PostMapping("/users/login")
     public ResponseEntity<UserLoginResponse> login(
             @RequestBody @Valid UserLoginRequest userLoginRequest){
@@ -51,17 +51,17 @@ public class UserController {
 
     }
 
-    // 修改密碼
-    @PostMapping("/users/changepassword")
+    // 3. 修改密碼API
+    @PostMapping("/users/me/password/change")
     public ResponseEntity<Map<String,String>> changepassword(
-            @RequestHeader("Authorization") String authHeader,
+            HttpServletRequest request, // 直接拿 Filter 放進 request 的資料
             @RequestBody @Valid ChangePasswordRequest changePasswordRequest){
 
-        // 標準規範 讓前後端統一知道這是 JWT token
-        String accessToken = authHeader.replace("Bearer ", "");
+        // 從 request 拿使用者 email（Filter 已經驗證過 token）
+        String userEmail = (String) request.getAttribute("email");
 
         // 傳入userService裡的changePassword去做驗證及修改密碼
-        userService.changePassword(accessToken, changePasswordRequest);
+        userService.changePassword(userEmail, changePasswordRequest);
 
         // 修改成功
         Map<String, String> response = new HashMap<>(); // 用來存放等等傳入body的訊息
@@ -71,16 +71,16 @@ public class UserController {
 
     }
 
-    // 更新token
-    @PostMapping("/users/refresh")
+    // 4. 更新token API
+    @PostMapping("/users/me/token/refresh")
     public ResponseEntity<RefreshTokenResponse> refresh(
-            @RequestHeader("Authorization") String authHeader) {
+            HttpServletRequest request ) {
 
-        // 標準規範 讓前後端統一知道這是 JWT token
-        String refreshToken = authHeader.replace("Bearer ", "");
+        // 從 request 拿使用者 email（Filter 已經驗證過 token）
+        String userEmail = (String) request.getAttribute("email");
 
         // 傳入 Refresh Token 到 userService 裡的refreshAccessToken去申請新的 Access Token
-        String newAccessToken = userService.refreshAccessToken(refreshToken);
+        String newAccessToken = userService.refreshAccessToken(userEmail);
 
         RefreshTokenResponse response = new RefreshTokenResponse();
         response.setAccessToken(newAccessToken);
