@@ -1,5 +1,6 @@
 package com.harvey.cakeshop.controller;
 
+import com.harvey.cakeshop.constant.ProductCategory;
 import com.harvey.cakeshop.dto.product.ProductCreateRequest;
 import com.harvey.cakeshop.model.Product;
 import com.harvey.cakeshop.service.ProductService;
@@ -10,13 +11,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 public class ProductController {
 
     @Autowired
     private ProductService productService;
 
-    // 查詢商品
+    // 查詢所有商品
+    @GetMapping("/products")
+    public ResponseEntity<List<Product>> getAllProducts(
+            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) String search) {
+
+        List<Product> productList = productService.getProducts(category,search);
+
+        if (productList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "沒有任何商品");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(productList);
+    }
+
+    // 查詢指定商品
     @GetMapping("/products/{productId}")
     public ResponseEntity<Product> getProduct(
             @PathVariable Integer productId) {
@@ -24,7 +42,7 @@ public class ProductController {
         Product product = productService.getProductById(productId);
 
         if (product == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "商品不存在，無法查詢");
         }  else {
             return ResponseEntity.status(HttpStatus.OK).body(product);
         }

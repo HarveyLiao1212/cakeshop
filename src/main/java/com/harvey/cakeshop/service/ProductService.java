@@ -1,6 +1,7 @@
 package com.harvey.cakeshop.service;
 
 
+import com.harvey.cakeshop.constant.ProductCategory;
 import com.harvey.cakeshop.dto.product.ProductCreateRequest;
 import com.harvey.cakeshop.model.Product;
 import com.harvey.cakeshop.repository.ProductRepository;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -17,6 +20,24 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    // 查詢所有商品
+    public List<Product> getProducts(ProductCategory category, String search) {
+        if (category != null && search != null && !search.isBlank()) {
+            // 同時有分類和關鍵字
+            return productRepository.findByCategoryAndProductNameContaining(category, search);
+        } else if (category != null) {
+            // 只有分類
+            return productRepository.findByCategory(category);
+        } else if (search != null && !search.isBlank()) {
+            // 只有關鍵字
+            return productRepository.findByProductNameContaining(search);
+        } else {
+            // 什麼都沒傳
+            return productRepository.findAll();
+        }
+    }
+
 
     // 查詢商品
     public Product getProductById(Integer productId) {
