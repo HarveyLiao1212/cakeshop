@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -75,11 +77,16 @@ public class UserService {
 
             // 組裝回傳物件(email 和 Access Token 和 Refresh Token)
             UserLoginResponse userLoginResponse = new UserLoginResponse();
+
             userLoginResponse.setAccessToken(accessToken);
             userLoginResponse.setRefreshToken(refreshToken);
-            userLoginResponse.setEmail(optionalUser.get().getEmail());
+
+            Map<String, Object> info = new HashMap<>();
+            info.put("email", optionalUser.get().getEmail());
+            userLoginResponse.setInfo(info);
 
             return  userLoginResponse;
+
         }else {
             log.warn("email {} 的密碼不正確",  userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "輸入密碼錯誤");

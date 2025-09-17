@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,12 +54,9 @@ public class UserController {
 
     // 3. 修改密碼API
     @PostMapping("/users/me/password/change")
-    public ResponseEntity<Map<String,String>> changepassword(
-            HttpServletRequest request, // 直接拿 Filter 放進 request 的資料
+    public ResponseEntity<Map<String,String>> changePassword(
+            @AuthenticationPrincipal String userEmail,
             @RequestBody @Valid ChangePasswordRequest changePasswordRequest){
-
-        // 從 request 拿使用者 email（Filter 已經驗證過 token）
-        String userEmail = (String) request.getAttribute("email");
 
         // 傳入userService裡的changePassword去做驗證及修改密碼
         userService.changePassword(userEmail, changePasswordRequest);
@@ -74,10 +72,7 @@ public class UserController {
     // 4. 更新token API
     @PostMapping("/users/me/token/refresh")
     public ResponseEntity<RefreshTokenResponse> refresh(
-            HttpServletRequest request ) {
-
-        // 從 request 拿使用者 email（Filter 已經驗證過 token）
-        String userEmail = (String) request.getAttribute("email");
+            @AuthenticationPrincipal String userEmail) {
 
         // 傳入 Refresh Token 到 userService 裡的refreshAccessToken去申請新的 Access Token
         String newAccessToken = userService.refreshAccessToken(userEmail);

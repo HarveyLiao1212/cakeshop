@@ -1,17 +1,20 @@
 package com.harvey.cakeshop.dto;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserLoginResponse {
 
-    private String email;
+    private Map<String, Object> info = new HashMap<>(); // 包 email 或其他個人資訊
     private String accessToken;
     private String refreshToken;
 
-    public String getEmail() {
-        return email;
+    public Map<String, Object> getInfo() {
+        return info;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setInfo(Map<String, Object> info) {
+        this.info = info;
     }
 
     public String getAccessToken() {

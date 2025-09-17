@@ -1,5 +1,6 @@
 package com.harvey.cakeshop.model;
 
+import com.harvey.cakeshop.constant.ProductCategory;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -16,8 +17,9 @@ public class Product {
     @Column(name = "product_name")
     private String productName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    private String category;
+    private ProductCategory category;
 
     @Column(name = "image_url")
     private String imageUrl;
@@ -53,11 +55,11 @@ public class Product {
         this.productName = productName;
     }
 
-    public String getCategory() {
+    public ProductCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ProductCategory category) {
         this.category = category;
     }
 
