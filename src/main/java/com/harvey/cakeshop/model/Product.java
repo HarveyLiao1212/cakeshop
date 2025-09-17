@@ -2,10 +2,14 @@ package com.harvey.cakeshop.model;
 
 import com.harvey.cakeshop.constant.ProductCategory;
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "product")
 public class Product {
 
@@ -33,9 +37,11 @@ public class Product {
     @Column(name = "description")
     private String description;
 
+    @CreatedDate
     @Column(name = "created_date")
     private Date createdDate;
 
+    @LastModifiedDate
     @Column(name = "last_modified_date")
     private Date lastModifiedDate;
 

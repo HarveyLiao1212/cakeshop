@@ -1,9 +1,8 @@
 package com.harvey.cakeshop.controller;
 
-import com.harvey.cakeshop.dto.*;
+import com.harvey.cakeshop.dto.account.*;
 import com.harvey.cakeshop.model.User;
 import com.harvey.cakeshop.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

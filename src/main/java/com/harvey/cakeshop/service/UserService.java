@@ -1,10 +1,10 @@
 package com.harvey.cakeshop.service;
 
 
-import com.harvey.cakeshop.dto.ChangePasswordRequest;
-import com.harvey.cakeshop.dto.UserLoginRequest;
-import com.harvey.cakeshop.dto.UserLoginResponse;
-import com.harvey.cakeshop.dto.UserRegisterRequest;
+import com.harvey.cakeshop.dto.account.ChangePasswordRequest;
+import com.harvey.cakeshop.dto.account.UserLoginRequest;
+import com.harvey.cakeshop.dto.account.UserLoginResponse;
+import com.harvey.cakeshop.dto.account.UserRegisterRequest;
 import com.harvey.cakeshop.model.User;
 import com.harvey.cakeshop.repository.UserRepository;
 import org.apache.commons.codec.digest.DigestUtils;

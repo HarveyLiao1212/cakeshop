@@ -1,4 +1,4 @@
-package com.harvey.cakeshop.dto;
+package com.harvey.cakeshop.dto.account;
 
 import jakarta.validation.constraints.NotBlank;
 

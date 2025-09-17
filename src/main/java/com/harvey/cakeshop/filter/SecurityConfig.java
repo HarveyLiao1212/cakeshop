@@ -23,7 +23,7 @@ public class SecurityConfig {
 
         // 設定授權規則
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/users/login", "/users/register", "/products/{productId}").permitAll() // 登入/註冊放行
+                .requestMatchers("/users/login", "/users/register", "/products/{productId}", "/products").permitAll() // 登入/註冊放行
                 .anyRequest().authenticated() // 其他 API 需要驗證
         );
 

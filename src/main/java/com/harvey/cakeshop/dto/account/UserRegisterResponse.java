@@ -1,12 +1,4 @@
-package com.harvey.cakeshop.dto;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+package com.harvey.cakeshop.dto.account;
 
 import java.util.Date;
 
