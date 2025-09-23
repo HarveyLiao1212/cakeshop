@@ -22,10 +22,16 @@ public class ProductController {
     // 查詢所有商品
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts(
+            // 查詢條件 filtering
             @RequestParam(required = false) ProductCategory category,
-            @RequestParam(required = false) String search) {
+            @RequestParam(required = false) String search,
 
-        List<Product> productList = productService.getProducts(category,search);
+            // 排序 sorting
+            @RequestParam(defaultValue = "createdDate") String orderBy,
+            @RequestParam(defaultValue = "desc") String sort
+    ) {
+
+        List<Product> productList = productService.getProducts(category,search,orderBy,sort);
 
         if (productList.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "沒有任何商品");
