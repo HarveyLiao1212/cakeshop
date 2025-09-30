@@ -5,9 +5,12 @@ import com.harvey.cakeshop.dto.product.ProductCreateRequest;
 import com.harvey.cakeshop.model.Product;
 import com.harvey.cakeshop.service.ProductService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,6 +23,7 @@ public class ProductController {
     private ProductService productService;
 
     // 查詢所有商品
+    @Validated
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts(
             // 查詢條件 filtering
@@ -28,7 +32,11 @@ public class ProductController {
 
             // 排序 sorting
             @RequestParam(defaultValue = "createdDate") String orderBy,
-            @RequestParam(defaultValue = "desc") String sort
+            @RequestParam(defaultValue = "desc") String sort,
+
+            // 分業 pages
+            @RequestParam(defaultValue = "6") @Max(1000) @Min(0) Integer limit,
+            @RequestParam(defaultValue = "0") @Min(0) Integer offest
     ) {
 
         List<Product> productList = productService.getProducts(category,search,orderBy,sort);
